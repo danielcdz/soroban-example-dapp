@@ -37,13 +37,16 @@ if [[ "$STELLAR_RPC_HOST" == "" ]]; then
   elif [[ "$NETWORK" == "futurenet" ]]; then
     STELLAR_RPC_HOST="https://rpc-futurenet.stellar.org:443"
     STELLAR_RPC_URL="$STELLAR_RPC_HOST"
+  elif [[ "$NETWORK" == "testnet" ]]; then
+    STELLAR_RPC_HOST="https://soroban-testnet.stellar.org:443"
+    STELLAR_RPC_URL="$STELLAR_RPC_HOST"
   else
     # assumes standalone on quickstart, which has the stellar/rpc path
     STELLAR_RPC_HOST="http://localhost:8000"
     STELLAR_RPC_URL="$STELLAR_RPC_HOST/stellar/rpc"
   fi
-else 
-  STELLAR_RPC_URL="$STELLAR_RPC_HOST"  
+else
+  STELLAR_RPC_URL="$STELLAR_RPC_HOST"
 fi
 
 case "$1" in
@@ -54,6 +57,10 @@ standalone)
 futurenet)
   STELLAR_NETWORK_PASSPHRASE="Test SDF Future Network ; October 2022"
   FRIENDBOT_URL="https://friendbot-futurenet.stellar.org/"
+  ;;
+  testnet)
+  STELLAR_NETWORK_PASSPHRASE="Test SDF Network ; September 2015"
+  FRIENDBOT_URL="https://friendbot.stellar.org/"
   ;;
 *)
   echo "Usage: $0 standalone|futurenet [rpc-host]"
@@ -72,10 +79,10 @@ stellar network add \
 
 echo Add $NETWORK to .soroban-example-dapp for use with npm scripts
 mkdir -p .soroban-example-dapp
-echo $NETWORK > ./.soroban-example-dapp/network
-echo $STELLAR_RPC_URL > ./.soroban-example-dapp/rpc-url
-echo "$STELLAR_NETWORK_PASSPHRASE" > ./.soroban-example-dapp/passphrase
-echo "{ \"network\": \"$NETWORK\", \"rpcUrl\": \"$STELLAR_RPC_URL\", \"networkPassphrase\": \"$STELLAR_NETWORK_PASSPHRASE\" }" > ./shared/config.json
+echo $NETWORK >./.soroban-example-dapp/network
+echo $STELLAR_RPC_URL >./.soroban-example-dapp/rpc-url
+echo "$STELLAR_NETWORK_PASSPHRASE" >./.soroban-example-dapp/passphrase
+echo "{ \"network\": \"$NETWORK\", \"rpcUrl\": \"$STELLAR_RPC_URL\", \"networkPassphrase\": \"$STELLAR_NETWORK_PASSPHRASE\" }" >./shared/config.json
 
 if !(stellar keys ls | grep token-admin 2>&1 >/dev/null); then
   echo Create the token-admin identity
@@ -102,7 +109,7 @@ ABUNDANCE_ID="$(
     --alias abundance
 )"
 echo "Contract deployed succesfully with ID: $ABUNDANCE_ID"
-echo -n "$ABUNDANCE_ID" > .soroban-example-dapp/abundance_token_id
+echo -n "$ABUNDANCE_ID" >.soroban-example-dapp/abundance_token_id
 
 # echo Deploy the crowdfund contract
 CROWDFUND_ID="$(
@@ -111,7 +118,7 @@ CROWDFUND_ID="$(
     --alias crowdfund
 )"
 echo "Contract deployed succesfully with ID: $CROWDFUND_ID"
-echo -n "$CROWDFUND_ID" > .soroban-example-dapp/crowdfund_id
+echo -n "$CROWDFUND_ID" >.soroban-example-dapp/crowdfund_id
 
 echo "Initialize the abundance token contract"
 stellar contract invoke \
