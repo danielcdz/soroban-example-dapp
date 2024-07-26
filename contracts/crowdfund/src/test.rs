@@ -2,7 +2,7 @@
 
 use super::testutils::{register_test_contract as register_crowdfund, Crowdfund};
 use soroban_sdk::{
-    testutils::{Address as AddressTestTrait, Events, Ledger},
+    testutils::{Address as _, Events, Ledger},
     token, vec, Address, Env, IntoVal, Symbol, Val, Vec,
 };
 

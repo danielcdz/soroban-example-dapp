@@ -28,8 +28,8 @@ impl Token {
             panic!("already initialized")
         }
         write_administrator(&e, &admin);
-        if decimal > u8::MAX.into() {
-            panic!("Decimal must fit in a u8");
+        if decimal > 18 {
+            panic!("Decimal must not be greater than 18");
         }
 
         write_metadata(
@@ -51,7 +51,6 @@ impl Token {
     /// * `amount` - The amount of tokens to mint (remember to multiply by `decimals`!)
     pub fn mint(e: Env, to: Address, amount: i128) {
         check_nonnegative_amount(amount);
-        to.require_auth();
 
         e.storage()
             .instance()

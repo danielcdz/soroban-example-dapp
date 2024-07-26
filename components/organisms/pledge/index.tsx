@@ -3,16 +3,11 @@ import { Card, ConnectButton, Loading, ProgressBar } from '../../atoms'
 import styles from './style.module.css'
 import { Spacer } from '../../atoms/spacer'
 import { Utils } from '../../../shared/utils'
-import {
-  useAccount,
-  useSubscription,
-} from '../../../hooks'
+import { useAccount, useSubscription } from '../../../hooks'
 import {
   crowdfund as crowdfundContract,
   abundance as abundanceContract,
 } from '../../../shared/contracts'
-
-import { scValToNative } from '@stellar/stellar-sdk'
 import { Deposits, FormPledge } from '../../molecules'
 
 const Pledge: FunctionComponent = () => {
@@ -60,18 +55,29 @@ const Pledge: FunctionComponent = () => {
   useSubscription(
     crowdfundContract.options.contractId,
     'pledged_amount_changed',
-    React.useMemo(() => event => {
-      let eventTokenBalance = event.value
-      setAbundance({ ...abundance!, balance: scValToNative(eventTokenBalance) })
-    }, [abundance])
+    React.useMemo(
+      () => event => {
+        setAbundance({
+          ...abundance!,
+          balance: crowdfundContract.spec.funcResToNative(
+            'balance',
+            event.value
+          ),
+        })
+      },
+      [abundance]
+    )
   )
 
   useSubscription(
     crowdfundContract.options.contractId,
     'target_reached',
-    React.useMemo(() => () => {
-      setTargetReached(true)
-    }, [])
+    React.useMemo(
+      () => () => {
+        setTargetReached(true)
+      },
+      []
+    )
   )
 
   return (
@@ -80,19 +86,22 @@ const Pledge: FunctionComponent = () => {
         <Loading size={64} />
       ) : (
         <>
-          {targetReached && (
-            <h6>SUCCESSFUL CAMPAIGN !!</h6>
-          )}
+          {targetReached && <h6>SUCCESSFUL CAMPAIGN !!</h6>}
           <h6>PLEDGED</h6>
           <div className={styles.pledgeAmount}>
-            {Utils.formatAmount(abundance.balance, abundance.decimals)} {abundance.symbol}
+            {Utils.formatAmount(abundance.balance, abundance.decimals)}{' '}
+            {abundance.symbol}
           </div>
           <span className={styles.pledgeGoal}>{`of ${Utils.formatAmount(
             crowdfund.target,
             abundance.decimals
           )} ${abundance.symbol} goal`}</span>
           <ProgressBar
-            value={Utils.percentage(abundance.balance, crowdfund.target, abundance.decimals)}
+            value={Utils.percentage(
+              abundance.balance,
+              crowdfund.target,
+              abundance.decimals
+            )}
           />
           <div className={styles.wrapper}>
             <div>
