@@ -250,4 +250,3 @@ fn test_zero_allowance() {
     token.transfer_from(&spender, &from, &spender, &0);
     assert!(token.get_allowance(&from, &spender).is_none());
 }
-
